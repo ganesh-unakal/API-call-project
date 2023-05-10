@@ -1,60 +1,47 @@
-import React, { useState } from "react";
+import Header from './component/Header/Header'
+import './App.css';
+import Products from './component/products/Products';
+import { useState } from 'react';
+import Cart from './component/Cart/cart';
+import CartProvider from './component/store/CartContextProvider';
+import {Route, Routes} from 'react-router-dom';
+import About from './component/pages/About';
+import Home from './component/pages/Home';
 
-import MoviesList from "./components/MoviesList";
-import "./App.css";
 
 function App() {
-  const [movies, setMovies] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError]= useState(null)
+ const [showCart, setShowCart]=useState(false);
 
-  const fetchMovieHandler = async () => {
-    setIsLoading(true);
-    setError(null);
-    try{
-      const response = await fetch("https://swapi.dev/api/films/");
-    
-      if(!response.ok){
-        throw new Error('something went wrong')
-      }
-    
-      const data = await response.json(); //json is for to convert js obect
+ const showCartHandler =()=>{
+  setShowCart(true);
+ }
 
-     
-      
-    const transformedMovies = data.results.map((movieData) => {
-      return {
-        id: movieData.episode_id,
-        title: movieData.title,
-        openingText: movieData.opening_crawl,
-        releaseDate: movieData.release_date,
-      };
-    });
-    setMovies(transformedMovies);
-    
-  } catch (error) {
-    setError(error.message)
-  }
-  setIsLoading(false);
-}
+ const hideCartHandler = () =>{
+  setShowCart(false)
+ }
 
-let content = 
-    
+// const router =createBrowserRouter([
+//   {
+//     path: '/ABOUT', element:<About />
+//   }
+// ])
+
 
   return (
-    <React.Fragment>
-      <section>
-        <button onClick={fetchMovieHandler}>Fetch Movies</button>
-      </section>
+    <CartProvider>
+     {showCart && < Cart onClose={hideCartHandler} />}
+    <Header onShowCart={showCartHandler} />
+   {/*<Products />*/}
 
-      <section>
-        {isLoading ? <p>loading...</p> : <MoviesList movies={movies} />}
-        {isLoading ? error : <p>{error}</p>}
-        {isLoading && movies.length === 0 &&  !error && <p>Found no movies</p>}
-        
-      </section>
-    </React.Fragment>
-  );
+    <Routes>
+      <Route path= '/'  element={<Home />} />
+      <Route path='/ABOUT' element={<About />} />
+      <Route path= '/STORE' element={<Products />} />
+    </Routes>
+  
+    </CartProvider >
+)
+
 }
 
 export default App;
